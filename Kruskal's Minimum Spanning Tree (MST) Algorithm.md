@@ -1,86 +1,92 @@
-# Ex. No: 18A - Prim's Minimum Spanning Tree (MST) Algorithm
+# Ex. No: 18B - Kruskal's Minimum Spanning Tree (MST) Algorithm
 
 ## AIM:
-To write a Python program for **Prim's Minimum Spanning Tree (MST)** algorithm.
+To write a Python program for **Kruskal's algorithm** to find the Minimum Spanning Tree (MST) of a given connected, undirected, and weighted graph.
 
 ## ALGORITHM:
 
-**Step 1**: Initialize the `key[]` array to infinity, set the first vertex's key to `0`, and create `mstSet[]` and `parent[]` arrays.
+**Step 1**: Sort all the edges of the graph in non-decreasing order of their weights.
 
-**Step 2**: Select the vertex with the smallest key value not yet included in `mstSet`.
+**Step 2**: Initialize the `parent[]` and `rank[]` arrays for each vertex to keep track of the disjoint sets.
 
-**Step 3**: Add the selected vertex to `mstSet`.
+**Step 3**: Iterate through the sorted edges and pick the smallest edge. Check whether including this edge will form a cycle using the union-find method:
+- If the vertices of the edge belong to different sets, include it in the MST.
+- Perform a union of these two sets.
 
-**Step 4**: For all adjacent vertices:
-- If the edge weight is smaller than their current key value, and the vertex is not in `mstSet`, then:
-  - Update their key value
-  - Update their parent to the current vertex
+**Step 4**: Repeat Step 3 until the MST contains exactly `V-1` edges.
 
-**Step 5**: Repeat Steps 2–4 until all vertices are included in the MST.
-
-**Step 6**: Print the resulting Minimum Spanning Tree using the `parent[]` array.
+**Step 5**: Print the edges included in the MST and the total minimum cost.
 
 ## PYTHON PROGRAM
 
 ```
+class Graph:
+    def __init__(self, vertices):
+        self.V = vertices
+        self.graph = []
 
-import sys
+    def add_edge(self, u, v, w):
+        self.graph.append([u, v, w])
 
-class PrimMST:
-    def __init__(self, graph):
-        self.graph = graph
-        self.V = len(graph)
+    def find(self, parent, i):
+        if parent[i] != i:
+            parent[i] = self.find(parent, parent[i])
+        return parent[i]
 
-    def min_key(self, key, mstSet):
-        min_val = sys.maxsize
-        min_index = -1
-        for v in range(self.V):
-            if key[v] < min_val and not mstSet[v]:
-                min_val = key[v]
-                min_index = v
-        return min_index
+    def union(self, parent, rank, xroot, yroot):
+        if rank[xroot] < rank[yroot]:
+            parent[xroot] = yroot
+        elif rank[xroot] > rank[yroot]:
+            parent[yroot] = xroot
+        else:
+            parent[yroot] = xroot
+            rank[xroot] += 1
 
-    def prim_mst(self):
-        key = [sys.maxsize] * self.V
-        parent = [None] * self.V
-        key[0] = 0
-        mstSet = [False] * self.V
-        parent[0] = -1
+    def kruskal(self):
+        result = []
+        self.graph.sort(key=lambda x: x[2])
 
-        for _ in range(self.V):
-            u = self.min_key(key, mstSet)
-            mstSet[u] = True
+        parent = []
+        rank = []
 
-            for v in range(self.V):
-                if self.graph[u][v] and not mstSet[v] and self.graph[u][v] < key[v]:
-                    key[v] = self.graph[u][v]
-                    parent[v] = u
+        for node in range(self.V):
+            parent.append(node)
+            rank.append(0)
 
-        self.print_mst(parent)
+        e = 0
+        i = 0
 
-    def print_mst(self, parent):
-        print("Edge \tWeight")
+        while e < self.V - 1:
+            u, v, w = self.graph[i]
+            i += 1
+            x = self.find(parent, u)
+            y = self.find(parent, v)
+
+            if x != y:
+                result.append([u, v, w])
+                e += 1
+                self.union(parent, rank, x, y)
+
+        print("Edges in the Minimum Spanning Tree:")
         total_weight = 0
-        for i in range(1, self.V):
-            print(f"{parent[i]} - {i} \t{self.graph[i][parent[i]]}")
-            total_weight += self.graph[i][parent[i]]
+        for u, v, w in result:
+            print(f"{u} -- {v} == {w}")
+            total_weight += w
         print("Total weight of MST:", total_weight)
 
-graph = [
-    [0, 2, 0, 6, 0],
-    [2, 0, 3, 8, 5],
-    [0, 3, 0, 0, 7],
-    [6, 8, 0, 0, 9],
-    [0, 5, 7, 9, 0]
-]
+g = Graph(4)
+g.add_edge(0, 1, 10)
+g.add_edge(0, 2, 6)
+g.add_edge(0, 3, 5)
+g.add_edge(1, 3, 15)
+g.add_edge(2, 3, 4)
 
-mst = PrimMST(graph)
-mst.prim_mst()
+g.kruskal()
 
 ```
 
 ## OUTPUT
-![image](https://github.com/user-attachments/assets/1dc66e5f-fff4-4345-b495-475ed417f704)
+![image](https://github.com/user-attachments/assets/b8254222-89dd-4dfe-bf0c-b42b6f58e968)
 
 ## RESULT
-Thus,the python program for Prim's Minimum Spanning Tree (MST) algorithm has been executed and verified successfully.
+Thus,the python program for Kruskal's algorithm to find the Minimum Spanning Tree (MST) of a given connected, undirected, and weighted graph has been executed and verified successfully.
