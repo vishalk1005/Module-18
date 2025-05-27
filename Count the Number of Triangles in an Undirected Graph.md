@@ -1,82 +1,55 @@
-# Ex. No: 18C - Dijkstra's Single Source Shortest Path Algorithm
+# Ex. No: 18E - Count the Number of Triangles in an Undirected Graph
 
 ## AIM:
-To write a Python program for **Dijkstra's single source shortest path algorithm**.
+To write a Python program to **count the number of triangles** present in an **undirected graph** using matrix operations.
 
 ## ALGORITHM:
 
-**Step 1**: Initialize a `distance[]` array with infinity for all vertices except the source, which is set to `0`.  
-Create a `sptSet[]` array (shortest path tree set) to keep track of vertices whose shortest distance from the source is finalized.
+**Step 1**: Initialize a matrix `aux2` to store the square of the adjacency matrix (i.e., `graph²`).  
+Also, initialize a matrix `aux3` to store the cube of the adjacency matrix (i.e., `graph³`).
 
-**Step 2**: Pick the vertex `u` with the minimum distance value from the set of vertices not yet processed.
+**Step 2**: Multiply the adjacency matrix with itself to compute `aux2 = graph × graph`.
 
-**Step 3**: For every adjacent vertex `v` of the picked vertex `u`, if the current distance to `v` is greater than the distance to `u` plus the edge weight `(u, v)`, then update the distance of `v`.
+**Step 3**: Multiply `aux2` with the adjacency matrix again to compute `aux3 = aux2 × graph`.
 
-**Step 4**: Mark the vertex `u` as processed in `sptSet`.
+**Step 4**: Compute the **trace** of the matrix `aux3` (i.e., the sum of diagonal elements of the matrix).
 
-**Step 5**: Repeat Steps 2–4 until all vertices are processed.
+**Step 5**: Divide the trace by **6** to get the number of triangles in the graph.  
+*(Each triangle is counted six times in the trace — twice per vertex and once per direction.)*
 
-**Step 6**: Print the shortest distances from the source to all other vertices.
+**Step 6**: Return the result.
 
 ## PYTHON PROGRAM
 
 ```
-import sys
 
-class Dijkstra:
-    def __init__(self, graph):
-        self.graph = graph
-        self.V = len(graph)
+import numpy as np
 
-    def min_distance(self, dist, sptSet):
-        min_val = sys.maxsize
-        min_index = -1
-        for v in range(self.V):
-            if dist[v] < min_val and not sptSet[v]:
-                min_val = dist[v]
-                min_index = v
-        return min_index
+def count_triangles(graph):
+    adj_matrix = np.array(graph)
 
-    def dijkstra(self, src):
-        dist = [sys.maxsize] * self.V
-        dist[src] = 0
-        sptSet = [False] * self.V
+    aux2 = np.matmul(adj_matrix, adj_matrix)
+    aux3 = np.matmul(aux2, adj_matrix)
 
-        for _ in range(self.V):
-            u = self.min_distance(dist, sptSet)
-            sptSet[u] = True
-            for v in range(self.V):
-                if (self.graph[u][v] > 0 and not sptSet[v] and 
-                    dist[u] + self.graph[u][v] < dist[v]):
-                    dist[v] = dist[u] + self.graph[u][v]
+    trace = np.trace(aux3)
+    triangle_count = trace // 6
 
-        self.print_solution(dist)
-
-    def print_solution(self, dist):
-        print("Vertex \tDistance from Source")
-        for i in range(self.V):
-            print(i, "\t", dist[i])
+    return triangle_count
 
 graph = [
-    [0, 4, 0, 0, 0, 0, 0, 8, 0],
-    [4, 0, 8, 0, 0, 0, 0, 11, 0],
-    [0, 8, 0, 7, 0, 4, 0, 0, 2],
-    [0, 0, 7, 0, 9, 14, 0, 0, 0],
-    [0, 0, 0, 9, 0, 10, 0, 0, 0],
-    [0, 0, 4, 14, 10, 0, 2, 0, 0],
-    [0, 0, 0, 0, 0, 2, 0, 1, 6],
-    [8, 11, 0, 0, 0, 0, 1, 0, 7],
-    [0, 0, 2, 0, 0, 0, 6, 7, 0]
+    [0, 1, 1, 0],
+    [1, 0, 1, 1],
+    [1, 1, 0, 1],
+    [0, 1, 1, 0]
 ]
 
-d = Dijkstra(graph)
-d.dijkstra(0)
+print("Number of triangles:", count_triangles(graph))
 
 ```
 
 ## OUTPUT
-![image](https://github.com/user-attachments/assets/f296dc77-3440-4b8e-a175-d543e98e7381)
 
+![image](https://github.com/user-attachments/assets/a1128ce5-68fb-4580-8b98-32ec9387f2a7)
 
 ## RESULT
-Thus, the python program for **Dijkstra's single source shortest path algorithm has been executed and verified successfully.
+Thus, the python function to accept a string, identify a word to be replaced, and replace it with a new word provided by the user has been executed and verified successfully.
